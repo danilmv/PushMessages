@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">PushMessages</string>
+    <string name="show_app">show app</string>
+    <string name="show_message">show message</string>
+    <string name="message">Message:</string>
 </resources>
