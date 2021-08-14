@@ -5,6 +5,7 @@ import android.app.PendingIntent
 import android.content.Intent
 import android.graphics.Color
 import android.os.Build
+import android.widget.RemoteViews
 import androidx.core.app.NotificationChannelCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -44,6 +45,11 @@ class MessagingService : FirebaseMessagingService() {
             notificationManager.createNotificationChannel(channel)
         }
 
+        val pendingIntent = PendingIntent.getActivities(this,
+            0,
+            arrayOf(Intent(this, MainActivity::class.java)),
+            PendingIntent.FLAG_UPDATE_CURRENT)
+
         val notification = NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle("Re-pushed message: ${remoteMessage.notification?.title}")
             .setColor(Color.GRAY)
@@ -51,12 +57,13 @@ class MessagingService : FirebaseMessagingService() {
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .setAutoCancel(true)
             .setCategory(Notification.CATEGORY_MESSAGE)
-            .setContentIntent(
-                PendingIntent.getActivities(this,
-                    0,
-                    arrayOf(Intent(this, MainActivity::class.java)),
-                    PendingIntent.FLAG_UPDATE_CURRENT)
-            )
+//            .setContentIntent(pendingIntent)
+            .setCustomContentView(RemoteViews(packageName,
+                R.layout.remoteview_notification)
+                .apply {
+                    setTextViewText(R.id.text_view, remoteMessage.notification?.body)
+                    setOnClickPendingIntent(R.id.button_show_app, pendingIntent)
+                })
             .setSmallIcon(R.drawable.ic_notification_icon_foreground)
             .build()
 
