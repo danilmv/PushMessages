@@ -1,8 +1,16 @@
 package com.andriod.pushmessages
 
+import android.app.Notification
+import android.app.PendingIntent
+import android.content.Intent
+import android.graphics.Color
+import android.os.Build
+import androidx.core.app.NotificationChannelCompat
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
+import androidx.core.app.NotificationManagerCompat.IMPORTANCE_LOW
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
-import java.lang.StringBuilder
 
 class MessagingService : FirebaseMessagingService() {
     override fun onNewToken(p0: String) {
@@ -20,9 +28,42 @@ class MessagingService : FirebaseMessagingService() {
         }
         DataManager.addMessage(msg.toString())
 
+        showSystemNotification(p0)
+    }
+
+    private fun showSystemNotification(remoteMessage: RemoteMessage) {
+        val notificationManager = NotificationManagerCompat.from(this)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannelCompat.Builder(CHANNEL_ID, IMPORTANCE_LOW)
+                .setName("MyChanel")
+                .setDescription("just a channel")
+                .build()
+            notificationManager.createNotificationChannel(channel)
+        }
+
+        val notification = NotificationCompat.Builder(this, CHANNEL_ID)
+            .setContentTitle("Re-pushed message: ${remoteMessage.notification?.title}")
+            .setColor(Color.GRAY)
+            .setSubText(remoteMessage.notification?.body)
+            .setPriority(NotificationCompat.PRIORITY_LOW)
+            .setAutoCancel(true)
+            .setCategory(Notification.CATEGORY_MESSAGE)
+            .setContentIntent(
+                PendingIntent.getActivities(this,
+                    0,
+                    arrayOf(Intent(this, MainActivity::class.java)),
+                    PendingIntent.FLAG_UPDATE_CURRENT)
+            )
+            .setSmallIcon(R.drawable.ic_notification_icon_foreground)
+            .build()
+
+        notificationManager.notify(NOTIFICATION_ID, notification)
     }
 
     companion object {
         const val TAG = "@@MessagingService"
+        const val CHANNEL_ID = "1"
+        const val NOTIFICATION_ID = 1
     }
 }
