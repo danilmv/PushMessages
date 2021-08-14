@@ -2,6 +2,7 @@ package com.andriod.pushmessages
 
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import java.lang.StringBuilder
 
 class MessagingService : FirebaseMessagingService() {
     override fun onNewToken(p0: String) {
@@ -9,7 +10,16 @@ class MessagingService : FirebaseMessagingService() {
     }
 
     override fun onMessageReceived(p0: RemoteMessage) {
-        DataManager.addMessage("onMessageReceived() called with: p0 = $p0")
+        val msg = StringBuilder()
+        msg.appendLine("onMessageReceived() called with:")
+        p0.notification?.let {
+            msg.appendLine("Title = ${it.title}")
+            msg.appendLine("Body = ${it.body}")
+            msg.appendLine("ChannelId = ${it.channelId}")
+            msg.appendLine("EventTIme = ${it.eventTime}")
+        }
+        DataManager.addMessage(msg.toString())
+
     }
 
     companion object {
