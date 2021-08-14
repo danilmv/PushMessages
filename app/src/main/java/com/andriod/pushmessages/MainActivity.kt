@@ -19,7 +19,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun configureScrollView() {
         DataManager.message.observe(this){
-            binding.scrollView.addView(
+            binding.container.addView(
                 TextView(this).apply { text = it }
             )
         }
