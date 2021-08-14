@@ -34,9 +34,11 @@ class MessagingService : FirebaseMessagingService() {
     private fun showSystemNotification(remoteMessage: RemoteMessage) {
         val notificationManager = NotificationManagerCompat.from(this)
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
+            && notificationManager.getNotificationChannel(CHANNEL_ID) == null
+        ) {
             val channel = NotificationChannelCompat.Builder(CHANNEL_ID, IMPORTANCE_LOW)
-                .setName("MyChanel")
+                .setName("MyChanel again")
                 .setDescription("just a channel")
                 .build()
             notificationManager.createNotificationChannel(channel)
